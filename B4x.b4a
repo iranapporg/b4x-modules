@@ -1,0 +1,123 @@
+﻿Build1=Default,b4a.example
+File1=common_data.db
+FileGroup1=Default Group
+Group=Default Group
+Library1=amir_retrofit
+Library10=jpegutils
+Library11=json
+Library12=manampersiandate
+Library13=okhttp
+Library14=okhttputils2
+Library15=phone
+Library16=reflection
+Library17=runtimepermissions
+Library18=sql
+Library19=stringutils
+Library2=byteconverter
+Library20=xui
+Library21=hitex_lottie
+Library3=contentresolver
+Library4=core
+Library5=cropimageview
+Library6=dialogs
+Library7=downloadmanager
+Library8=encryption
+Library9=javaobject
+ManifestCode='This code will be applied to the manifest file during compilation.~\n~'You do not need to modify it in most cases.~\n~'See this link for for more information: https://www.b4x.com/forum/showthread.php?p=78136~\n~AddManifestText(~\n~<uses-sdk android:minSdkVersion="5" android:targetSdkVersion="28"/>~\n~<supports-screens android:largeScreens="true" ~\n~    android:normalScreens="true" ~\n~    android:smallScreens="true" ~\n~    android:anyDensity="true"/>)~\n~SetApplicationAttribute(android:icon, "@drawable/icon")~\n~SetApplicationAttribute(android:label, "$LABEL$")~\n~CreateResourceFromFile(Macro, Themes.DarkTheme)~\n~'End of default text.~\n~
+Module1=AES
+Module10=Lottie
+Module11=Picture
+Module12=PictureChooser
+Module13=ProvinceManager
+Module14=RSA
+Module15=Share
+Module16=Starter
+Module17=Strings
+Module18=SVGViewer
+Module19=Util
+Module2=Application
+Module20=Validation
+Module21=Views
+Module3=B4X
+Module4=Base64Image
+Module5=Conversion
+Module6=Device
+Module7=Downloader
+Module8=FileFolder
+Module9=JSON
+NumberOfFiles=1
+NumberOfLibraries=21
+NumberOfModules=21
+Version=11
+@EndOfDesignText@
+#Region  Project Attributes 
+	#ApplicationLabel: B4A Example
+	#VersionCode: 1
+	#VersionName: 
+	'SupportedOrientations possible values: unspecified, landscape or portrait.
+	#SupportedOrientations: unspecified
+	#CanInstallToExternalStorage: False
+#End Region
+
+#Region  Activity Attributes 
+	#FullScreen: False
+	#IncludeTitle: True
+#End Region
+
+Sub Process_Globals
+	'These global variables will be declared once when the application starts.
+	'These variables can be accessed from all modules.
+
+End Sub
+
+Sub Globals
+	'These global variables will be redeclared each time the activity is created.
+	'These variables can only be accessed from this module.
+Dim m As Amir_RetrofitRequest
+
+End Sub
+
+Sub Activity_Create(FirstTime As Boolean)
+	
+	Dim r As RSA
+	r.Initialize(r.KEY_SIZE_2048,"",$"-----BEGIN PRIVATE KEY-----
+MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCsectsSfPHsTTY
+JJ8JOzAGaIAzJ4KuKw5l2msVpdZh5rWNxgq3mrjq5A4l+XM5zSK2m6YuXGe+eNOf
+wtG5lbuV4xMJOP27uKfjx7kKJgfH+fqGAmuoFMASEYvaXrvpsZrFBfp88h5LGj+I
+PfC/TylqqbhmoNBAbMApNOZbqrISekYpbMS77EXQ2WPwk8o7d5aM7Q4+BzhWn/I6
+PtXoEaxDTw1foUVk0uxFUWyZv+Vxgbuu6gwmXxF7ZWe5U9sChdVvppxV4Sqi4jf6
+MLkJZgN5rk3+kV59JntZHT7pXh24tEdhFQGIJ/PjMwYlt/ZpjkqUC/fq89MvqmmB
+T8Li9ZE9AgMBAAECggEAaxcki5RPXUpWOW5joOOzKgdwslJx/ZqWUf+QRdy2hAsv
+51t0BBR5hL8dWc7NELKiPyfdwyN09vsmyye3+LdTxfk8NJnCUfCRrgiwh/CdHDnG
+p7aRCcf4ij+Cyo/PtYalRngz06ixzof5sqpi9SY93RCMgoyPQbFEj1FdRsVx0646
+/O2jJunkYABOhmFCBITdbdAg5kkcJ/To/zCNkK1r0iP3jUmCqu29U2C7tMgM8YQa
+nj873pfvq2ZACANAPl3PgEiZjOQzOdZamlpyMi65GssylGgLXHOn+XdB+WR6zJ1v
+3xV8tcp8bm74qOzjFfifsNTlbamoEoORq3iZrBndsQKBgQDbPsABz2Fxz5M/vaEb
+cXoFXrFFpJAryBKrLyOeEW+QqhKOlZSlPC0FImmphr1ed9sGU9kvWaf7PCPwK4e+
+NgdVFJwnBFnjFad4uH2gPLd/zpqx918sQnLlqg3CmzPb1EtgR9uCYtYn3J6V/gA9
+kATRQ7zgf0PEyoLTr9cjGRgtawKBgQDJY90nDPkUNpf2AUY6FuAjK0eLKEl1462F
+H+Uo4gOXsDAUFU9jQe+byU5jo+9D8647V7uEDr+afdQBHWQuTaBPmTjZsN3FCPRC
+FU10EVmp4kLCaB0ihgAVIr9KEpW8AmeQ4ZO2lopT9ZjywqWNmVGSnsTFuFhSQ1xa
+tmen7/399wKBgB5FrstRMBo/2AwQCeO5Kmj9Zyq/iyyQZot+acOUkrv9z6wiWTDr
+eyffVYmT0ifuEq7v+uf/0CLvbeLmj8qiuSZ1Pw5gGm0xezs+9hGe8JNUGqYCCwEY
+d7bgYSACwAlVacb0hQmezgUZAEijlrLpZNDkMnso91l/wMqr19+/wkfbAoGAWITC
+ghWbrZzJcmHhAktnvU2aprnQgDbQ4EDCsxOUzKmumEU9nb0vmmQDRpyZ4F5NaNwJ
+GeR5p2hDNTI8BHYuTo5khJrO/3oOErXWU3wE0z0WZujoVXJcuu2I8v/0PK055F6i
+VJEawAilb57KsdCAIFgU2WtLtuzQvTaLnS9JjsUCgYEAz9cCOXcOd5SMWtTgXW0o
+c17uTYnyHnLEZAyzZwm7Pks56pIdPDoWUTgGb+W0OZSRjafZ2OE/BpubSefx5yjD
+ILboBZWIRZjyWcDZxXEq32wKIsiUXcK07zkqbkrZuTaL1sAplznuodUWvQ+BRI7/
+OQCWrGKR3k6WMJ8gaZtba+k=
+-----END PRIVATE KEY-----
+
+"$)
+	Log(r.Decrypt("jozema6ydrV3Q2ITD+DUW23eQdYiDlN2cmVq/KVrMi5Q71PQ4qkthKIuRH/68VQx8FCvTffqS4BW5/Zv/60dIDetfKShJReam6jXS4ljDFf1UD+7HDYkSajcAlc4QYiD0Z+km2og3eWjjpudjJQzkZq4gtUzFZ0xtOPnAvLeBldLhkdneZa0SG1Dcg2QnsriyICt+Pe7bMzw5nMyYVTFOVY9gVeve6knL2bJONDnjKpE/VhhKyMJPn13QCEreMnruzX6K/MetY8ME/MDqxKUr/iyn2l7w28hitmOcPA7i1/AIZaPW4ielBHOgfnBNwsyy3TWLFKzYNsN51m+totMBA=="))
+	
+End Sub
+
+Sub Activity_Resume
+
+End Sub
+
+Sub Activity_Pause (UserClosed As Boolean)
+
+End Sub
