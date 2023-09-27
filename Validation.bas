@@ -1,11 +1,12 @@
 ﻿B4A=true
-Group=Libraries
+Group=Default Group
 ModulesStructureVersion=1
 Type=StaticCode
 Version=7.8
 @EndOfDesignText@
 'Code module
 'Subs in this code module will be accessible from all modules.
+#IgnoreWarnings: 12
 Sub Process_Globals
 	'These global variables will be declared once when the application starts.
 	'These variables can be accessed from all modules.
@@ -46,32 +47,27 @@ End Sub
 
 Public Sub IsJson(Str As String) As Boolean
 	
-	Dim js As JSONParser
-	js.Initialize(Str)
-	
-	Try
-		js.NextObject
+	If Regex.IsMatch($"[{\[]{1}([,:{}\[\]0-9.\-+Eaeflnr-u \n\r\t]|".*?")+[}\]]{1}"$, Str.Trim) And Str.Length > 2  Then
 		Return True
-	Catch
-		Try
-			Dim js As JSONParser
-			js.Initialize(Str)
-			js.NextArray
-			Return True
-		Catch
-			Return False
-		End Try
-	End Try
+	Else
+		Return False
+	End If
 	
 End Sub
 
 Public Sub IsIP(IP As String) As Boolean
 	
-	If Regex.IsMatch("\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}",IP) Then
-		Return True
-	Else
+	If IP = "" Then Return False
+	
+	Try
+		If Regex.IsMatch("\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}",IP) Then
+			Return True
+		Else
+			Return False
+		End If
+	Catch
 		Return False
-	End If
+	End Try
 	
 End Sub
 
@@ -180,11 +176,16 @@ Public Sub IsNationalID(ID As String) As Boolean
 End Sub
 
 Public Sub IsNumbers(Data As String) As Boolean
+	If Data = Null Then Return False
 	Return IsNumber(Data)
 End Sub
 
 Public Sub IsDate(Date As String) As Boolean
 	Return Regex.IsMatch("\d{4}-\d{1,2}-\d{1,2}",Date)
+End Sub
+
+Public Sub IsDate2(Date As String,Seprator As String) As Boolean
+	Return Regex.IsMatch($"\d{4}${Seprator}\d{1,2}${Seprator}\d{1,2}"$,Date)
 End Sub
 
 Public Sub IsDateTime(sDateTime As String) As Boolean
@@ -271,8 +272,8 @@ Public Sub IsMap(Data As Object) As Boolean
 End Sub
 
 Public Sub IsList(Data As Object) As Boolean
-	
-	If GetType(Data) = "__NSArrayM" Then
+
+	If GetType(Data) = "__NSArrayM" Or GetType(Data) = "java.util.ArrayList" Then
 		Return True
 	Else
 		Return False
@@ -384,7 +385,7 @@ End Sub
 Sub IsPicture(Dir As String,Filename As String) As Boolean
 	
 	Try
-		LoadBitmapResize(Dir,Filename,10,10,True)
+		LoadBitmapResize(Dir,Filename,10dip,10dip,True)
 		Return True
 	Catch
 		Return False

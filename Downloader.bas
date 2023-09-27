@@ -1,10 +1,10 @@
 ﻿B4A=true
-Group=Libraries
+Group=Default Group
 ModulesStructureVersion=1
 Type=Class
 Version=10.2
 @EndOfDesignText@
-#Event: Complete(Tag As Object)
+#Event: Complete(Tag As Object,Status as Boolean)
 #Event: Progress(Progress As Float,Total As Float)
 #Event: Error(Message As String)
 #if b4a

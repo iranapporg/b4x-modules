@@ -1,10 +1,11 @@
 ﻿B4A=true
-Group=Libraries
+Group=Libraries\B4X
 ModulesStructureVersion=1
 Type=StaticCode
 Version=10.9
 @EndOfDesignText@
 'Code module
+#IgnoreWarnings: 12
 'Subs in this code module will be accessible from all modules.
 Private Sub Process_Globals
 
@@ -116,25 +117,35 @@ Sub ChangeFontByTag(Panel As Panel)
 	Next
 	#end if
 	
-End Sub
-
-Sub SetButtonStateBackground(Button As Button,Normal As Int,Press As Int,Disable As Int)
-	
-	#if b4i
-	Dim Ca As Canvas
-	Ca.Initialize(Button)
-	Ca.DrawColor(Normal)
-	
-	Dim No As NativeObject = Button
-	No.RunMethod("setBackgroundImage:forState:", Array(Ca.CreateBitmap, 0))
-	
-	Ca.DrawColor(Press)
-	No.RunMethod("setBackgroundImage:forState:", Array(Ca.CreateBitmap, 1))
-	
-	Ca.DrawColor(Disable)
-	No.RunMethod("setBackgroundImage:forState:", Array(Ca.CreateBitmap, 2))
-	#else
-	here
+	#if b4a
+	For Each v As View In Panel.GetAllViewsRecursive
+		
+		If v.Tag <> Null Then
+			
+			Dim Fontname As String = v.Tag
+			If Fontname = "" Then Continue
+			
+			If v Is Label Then
+				Dim l As Label
+				l = v
+				l.Typeface = Typeface.LoadFromAssets(Fontname)
+			End If
+			
+			If v Is Button Then
+				Dim l2 As Button
+				l2 = v
+				l2.Typeface = Typeface.LoadFromAssets(Fontname)
+			End If
+			
+			If v Is EditText Then
+				Dim l3 As EditText
+				l3 = v
+				l3.Typeface = Typeface.LoadFromAssets(Fontname)
+			End If
+			
+		End If
+		
+	Next
 	#End If
 	
 End Sub
@@ -164,129 +175,6 @@ Public Sub SetTextOrCSBuilderToLabel(Label_or_Button As B4XView, Text As Object)
    #end if
 End Sub
 
-Sub ShakeView (View As B4XView, Duration As Int)
-	Dim Left As Int = View.Left
-	Dim Delta As Int = 20dip
-	For i = 1 To 4
-		View.SetLayoutAnimated(Duration / 5, Left + Delta, View.Top, View.Width, View.Height)
-		Delta = -Delta
-		Sleep(Duration / 5)
-	Next
-	View.SetLayoutAnimated(Duration/5, Left, View.Top, View.Width, View.Height)
-End Sub
-
-'set all views enable to false
-Sub LockView(pnl As Panel)
-	
-	For Each v1 As B4XView In pnl.GetAllViewsRecursive
-		v1.Enabled  = False
-	Next
-	
-End Sub
-
-'set all views enable to true
-Sub UnLockView(pnl As Panel)
-	
-	For Each v1 As B4XView In pnl.GetAllViewsRecursive
-		v1.Enabled  = True
-	Next
-	
-End Sub
-
-Sub ScaleView(View As B4XView,Scale As Float)
-	
-	#if b4i
-	Dim no As NativeObject = Me
-	no.RunMethod("SetScaleTransformation:::", Array(View, Scale,Scale))
-	#if ObjC
-	- (void) SetScaleTransformation:(UIView*) view :(float)x :(float)y {
-	   view.transform = CGAffineTransformMakeScale(x, y);
-	}
-	#End if
-	#else
-	Scale View
-	#End If
-	
-End Sub
-
-Sub RotateView(View As View,Angle As Int)
-	#if b4i
-	Dim no As NativeObject = Me
-	no.RunMethod("rotateView:::", Array(View, 0, Angle * cPI / 180))
-	
-		#If OBJC
-	- (void) rotateView:(UIView*)view :(int)DurationMs :(double)angle {
-	[UIView animateWithDuration:DurationMs / 1000.0 delay:0.0f
-	options:UIViewAnimationOptionCurveEaseOut animations:^{
-	view.transform = CGAffineTransformMakeRotation(angle);
-	} completion:^(BOOL finished) {
-
-	}];
-	}
-	#End If
-#End If
-End Sub
-
-Sub SetHintColor(TextField As B4XView,Color As Int)
-	
-	#if b4i
-	Try
-		Dim t As TextField
-		t = TextField
-		Dim NoTxtField As NativeObject = t
-		Dim AttrTxt As AttributedString
-		AttrTxt.Initialize(t.HintText,t.Font,Color)
-		NoTxtField.SetField("attributedPlaceholder",AttrTxt)
-	Catch
-	End Try
-	#else
-	Dim t As EditText = TextField
-	t.HintColor = Color
-	#End If
-	
-End Sub
-
-Public Sub GetRelativeLeft(View As View,Parent As View) As Int
-	
-	#if b4i
-	Dim NaObj As NativeObject = Me
-	Dim r As Rect	=	NaObj.RunMethod("PositionInView::",Array(View,Parent))
-	Return r.Left
-	#else
-	If GetType(View) = "android.view.ViewRoot" Or GetType(View) = "android.view.ViewRootImpl" Then
-		Return 0
-	Else
-		'If V.Left is valid for this view returns a value then add it, else skip to the next parent
-		Try
-			Dim VW As View = View
-			Return VW.Left + GetRelativeLeft(View.RunMethod("getParent",Null))
-		Catch
-			Return GetRelativeLeft(View.RunMethod("getParent",Null))
-		End Try
-	End If
-	#end if
-	
-End Sub
-
-Public Sub GetRelativeTop(View As View,Parent As View) As Int
-	#if b4i
-	Dim NaObj As NativeObject = Me
-	Dim r As Rect=NaObj.RunMethod("PositionInView::",Array(View,Parent))
-	Return r.Top
-	#else
-	If GetType(View) = "android.view.ViewRoot" Or GetType(View) = "android.view.ViewRootImpl" Then
-		Return 0
-	Else
-		'If V.Top is valid for this view returns a value then add it, else skip to the next parent
-		Try
-			Dim VW As View = View
-			Return VW.Top + GetRelativeTop(View.RunMethod("getParent",Null))
-		Catch
-			Return GetRelativeTop(View.RunMethod("getParent",Null))
-		End Try
-	#end if
-End Sub
-
 Public Sub GetLineCount(Text As String) As Int
 	
 	Dim r() As String = Regex.Split(CRLF,Text.Replace("<br>",CRLF))
@@ -307,26 +195,6 @@ Sub CreateHaloEffect (Parent As B4XView, x As Int, y As Int, clr As Int)
 		CreateHaloEffectHelper(Parent,bmp, x, y, clr, radius)
 		Sleep(800)
 	Next
-End Sub
-
-Public Sub SetShadow (View As B4XView, Offset As Double, Color As Int)
-    #if B4J
-    Dim DropShadow As JavaObject
-	'You might prefer to ignore panels as the shadow is different.
-	'If View Is Pane Then Return
-    DropShadow.InitializeNewInstance(IIf(View Is Pane, "javafx.scene.effect.InnerShadow", "javafx.scene.effect.DropShadow"), Null)
-    DropShadow.RunMethod("setOffsetX", Array(Offset))
-    DropShadow.RunMethod("setOffsetY", Array(Offset))
-    DropShadow.RunMethod("setRadius", Array(Offset))
-    Dim fx As JFX
-    DropShadow.RunMethod("setColor", Array(fx.Colors.From32Bit(Color)))
-    View.As(JavaObject).RunMethod("setEffect", Array(DropShadow))
-    #Else If B4A
-    Offset = Offset * 2
-    View.As(JavaObject).RunMethod("setElevation", Array(Offset.As(Float)))
-    #Else If B4i
-	View.As(View).SetShadow(Color, Offset, Offset, 0.5, False)
-    #End If
 End Sub
 
 Private Sub CreateHaloEffectHelper (Parent As B4XView,bmp As B4XBitmap, x As Int, y As Int, clr As Int, radius As Int)

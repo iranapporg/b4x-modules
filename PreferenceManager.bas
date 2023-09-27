@@ -1,5 +1,5 @@
 ﻿B4i=true
-Group=Libraries
+Group=Default Group
 ModulesStructureVersion=1
 Type=Class
 Version=1.8
@@ -21,10 +21,12 @@ End Sub
 
 'Initializes the object. You can add parameters to this method if needed.
 Public Sub Initialize
-
 	If sql1.IsInitialized Then sql1.Close
-	sql1.Initialize(xui.DefaultFolder, "pm.dat", True)
-	CreateTable
+	Dim exist As Boolean = File.Exists(xui.DefaultFolder,"pm.dat")
+	sql1.Initialize(xui.DefaultFolder, "pm.dat", Not(exist))
+	If exist = False Then
+		CreateTable
+	End If
 End Sub
 
 Public Sub SetBoolean(key As String, value As Boolean)

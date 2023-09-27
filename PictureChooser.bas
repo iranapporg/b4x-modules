@@ -1,5 +1,5 @@
 ﻿B4A=true
-Group=Libraries
+Group=Default Group
 ModulesStructureVersion=1
 Type=Class
 Version=9.8
@@ -34,6 +34,7 @@ End Sub
 
 'Initializes the object. You can add parameters to this method if needed.
 'Min version is 10
+'Note: Use SetPage method before use
 'add below plist
 '<code>
 '#PlistExtra:<key>NSPhotoLibraryUsageDescription</key><string>Select a photo.</string>
@@ -540,8 +541,8 @@ Private Sub btncropDo_Click
 	p2.BringToFront
 	
 	Try
-		CV.ImageBitmap		=	LoadBitmapResize(sDir,sFilename,150%x,150%y,True)
-		CurrentUserBitmap	=	LoadBitmapResize(sDir,sFilename,150%x,150%y,True)
+		CV.ImageBitmap		=	LoadBitmapResize(sDir,sFilename,1MyCodes.GetPercentX(50),150%y,True)
+		CurrentUserBitmap	=	LoadBitmapResize(sDir,sFilename,1MyCodes.GetPercentX(50),150%y,True)
 	Catch
 				
 	End Try
@@ -677,7 +678,7 @@ Private Sub gpu_PictureTaken (Data() As Byte)
 	ou.Close
 	
 	Dim b2 As Bitmap
-	b2.InitializeResize(Dir,filename_,150%x,150%y,True)
+	b2.InitializeResize(Dir,filename_,1MyCodes.GetPercentX(50),150%y,True)
 	
 	If IsFrontCamera = False Then
 		b2	=	RotateBitmap(b2,90)

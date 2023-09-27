@@ -31,15 +31,8 @@ Public Sub Initialize(Dir As String,Filename As String)
 	recorder1.setOutputFile(Dir,Filename)
 	recorder1.prepare
 	#else
-	dir_ = Dir
-	If Filename.IndexOf(".mp3") > -1 Then
-		filename_ = Filename.Replace(".mp3",".mp4")
-		output_is_mp3 = True
-	Else
-		output_is_mp3 = False
-	End If
-	
-	recorder1.Initialize(Dir,filename_, 44100, True, 16, False)
+	File.Delete(Dir,Filename)
+	recorder1.Initialize(Dir,Filename, 44100, True, 16, True)
 	#end if
 	
 End Sub
@@ -60,16 +53,9 @@ Sub Start
 End Sub
 
 Sub Stop
-	
-	Try
-		Recording1 = False
-		recorder1.stop
-		If output_is_mp3 Then
-			filename_ = filename_.Replace(".mp4",".mp3")
-		End If
-		File.Copy(dir_,filename_.Replace(".mp3",".mp4"),dir_,filename_)
-	Catch
-	End Try
+
+	Recording1 = False
+	recorder1.stop
 	
 End Sub
 

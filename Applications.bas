@@ -1,9 +1,10 @@
 ﻿B4A=true
-Group=Libraries
+Group=Default Group
 ModulesStructureVersion=1
 Type=StaticCode
 Version=9.8
 @EndOfDesignText@
+#IgnoreWarnings: 12
 Private Sub Process_Globals
 
 End Sub
@@ -129,3 +130,9 @@ Sub ExitApp
 	#end if
 	
 End Sub
+
+#if b4i
+Sub ExitApplication
+	ExitApp
+End Sub
+#end if

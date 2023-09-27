@@ -1,5 +1,5 @@
 ﻿B4A=true
-Group=Libraries
+Group=Default Group
 ModulesStructureVersion=1
 Type=StaticCode
 Version=9.8
@@ -76,21 +76,10 @@ End Sub
 
 Public Sub IsJson(Str As String) As Boolean
 	
-	Dim js As JSONParser
-	js.Initialize(Str)
-	
-	Try
-		js.NextObject
+	If Regex.IsMatch($"[{\[]{1}([,:{}\[\]0-9.\-+Eaeflnr-u \n\r\t]|".*?")+[}\]]{1}"$, Str.Trim) And Str.Length > 2  Then
 		Return True
-	Catch
-		Try
-			Dim js As JSONParser
-			js.Initialize(Str)
-			js.NextArray
-			Return True
-		Catch
-			Return False
-		End Try
-	End Try
+	Else
+		Return False
+	End If
 	
 End Sub

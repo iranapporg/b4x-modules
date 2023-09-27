@@ -13,6 +13,7 @@ Private Sub Class_Globals
 	
 	Type Callback (Module As Object,Event As String,Error As String)
 	
+	Private is_busy As Boolean
 	Private http As HttpJob
 	Private xui As XUI
 	Private js As JSONParser
@@ -50,6 +51,7 @@ Private Sub Class_Globals
 	Private show_activity_on_error_event As String
 	
 	Private is_success = False
+	Private raw_ as String
 	
 End Sub
 
@@ -84,11 +86,11 @@ End Sub
 'End Sub</code>
 'into Main activity or page
 'in this event, you can show error page
-Sub ShowActivityOnError(ErrorType As String,Module As Object,Event As String) As HttpRequest2
+Sub ShowActivityOnError(ErrorType As String,ModuleTarget As Object,Event As String) As HttpRequest2
 	
 	show_activity_on_error_error_type	=	ErrorType
-	show_activity_on_error_module		=	Module
-	show_activity_on_error_event			=	Event
+	show_activity_on_error_module		=	ModuleTarget
+	show_activity_on_error_event		=	Event
 	
 	Return Me
 	
@@ -102,6 +104,11 @@ Sub Method(Val As String) As HttpRequest2
 	method_ = Val.ToUpperCase
 	Return Me
 	
+End Sub
+
+Sub RawBody(Raw As String) As HttpRequest2
+	raw_ = Raw
+	Return Me
 End Sub
 
 Sub RequestBody(data As String) As HttpRequest2
@@ -157,12 +164,12 @@ Sub Timeout(Second As Int) As HttpRequest2
 End Sub
 
 'call event after finish request
-Sub Callback(Module As Object,Event As String) As HttpRequest2
+Sub Callback(ModuleTarget As Object,Event As String) As HttpRequest2
 	
 	last_request.Put("module",module_)
 	last_request.Put("event",Event)
 	
-	module_ = Module
+	module_ = ModuleTarget
 	event_ = Event
 	
 	Return Me
@@ -195,6 +202,11 @@ Sub GetElapsedTime As Int
 	Return end_time - start_time
 End Sub
 
+'check request is doing or finished
+Sub IsBusy As Boolean
+	Return is_busy
+End Sub
+
 'get http status code
 Sub GetStatusCode As Int
 	Return http.Response.StatusCode	
@@ -221,6 +233,8 @@ Sub Submit(UrlOrEndpoint As String) As ResumableSub
 	Main.App.NetworkActivityIndicatorVisible = True
 	#End If
 	
+	is_busy = True
+	
 	http.Initialize("http",Me)
 	
 	UrlOrEndpoint = base_url & UrlOrEndpoint
@@ -235,8 +249,12 @@ Sub Submit(UrlOrEndpoint As String) As ResumableSub
 	
 	#region Set method
 	If method_ = "POST" Then
-		http.PostString(UrlOrEndpoint,query)
-
+		If raw_ = "" Then
+			http.PostString(UrlOrEndpoint,query)
+		Else
+			http.PostString(UrlOrEndpoint,raw_)
+		End If
+		
 	Else If method_ = "PUT" Then
 		http.PostString(UrlOrEndpoint,"")
 		http.GetRequest.InitializePut2(UrlOrEndpoint,query.GetBytes("UTF8"))
@@ -287,18 +305,24 @@ Sub Submit(UrlOrEndpoint As String) As ResumableSub
 	
 	#region Response request
 	Wait For JobDone(Job As HttpJob)
-
+		
+		is_busy = False
+	
 		#if b4i
 		Main.App.NetworkActivityIndicatorVisible = False
 		#End If
 
 		end_time = DateTime.Now
 		
-		If Job.Success Then
-			
-			#if debug
+		#if debug
+		Try
 			Log(Job.GetString)
-			#End If
+			Log(Job.ErrorMessage)
+		Catch
+		End Try
+		#End If
+		
+		If Job.Success Then
 			
 			is_success	=	True
 		
@@ -308,10 +332,14 @@ Sub Submit(UrlOrEndpoint As String) As ResumableSub
 		
 			If as_map Then
 				
-				If xui.SubExists(module_,event_ & "_onresponse",0) Then
-					CallSubDelayed3(module_,event_ & "_onresponse",ResultAsMap(request_result),"")
-					Return True
-				End If
+				Try
+					If xui.SubExists(module_,event_ & "_onresponse",0) Then
+						CallSubDelayed3(module_,event_ & "_onresponse",ResultAsMap(request_result),"")
+						Return True
+					End If
+				Catch
+				
+				End Try
 				
 				Return ResultAsMap(request_result)
 			
@@ -365,14 +393,18 @@ Sub Submit(UrlOrEndpoint As String) As ResumableSub
 		
 		If is_Json(job_error) Then
 			
-			job_error = job_error
-			
 			Dim j As JSONParser
 			j.Initialize(error2)
 			Return j.NextObject
 		
 		Else
-			Return job_error
+			If as_map = False And as_list = False Then
+				Return job_error
+			Else
+				If as_map Then
+					Return CreateMap("status":False,"result":job_error)
+				End If
+			End If
 		End If
 
 	End If		

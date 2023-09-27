@@ -1,5 +1,5 @@
 ﻿B4A=true
-Group=Libraries
+Group=Default Group
 ModulesStructureVersion=1
 Type=Class
 Version=9.8
@@ -8,7 +8,7 @@ Private Sub Class_Globals
 	Private su As StringUtils
 End Sub
 
-'this support aes 128 and 256
+'this support aes 128
 Public Sub Initialize
 	
 End Sub
@@ -63,17 +63,13 @@ Public Sub Encrypt(Text As String, Key As String,IV As String) As String
 		Reflector.Target = Cipher
 		Reflector.SetField2("cipher", o)
 	    
-		'ye iv tasadofi misasim
 		Dim IV2() As Byte = IV.GetBytes("UTF8")
 		Cipher.InitialisationVector = IV2
 
-		'encrypt mikonim text ro
 		Dim Encrypted() As Byte = Cipher.Encrypt(Text.GetBytes("UTF8"), kg.Key, True)
-		'    Dim hMac() As Byte = HashHmac(CombineBytes(IV,Encrypted),"1234567890012345")
 
-		'hala iv ro michasbonim b encrypted va tamam
-		Dim su As StringUtils
 		Return su.EncodeBase64(CombineBytes(IV2,Encrypted))
+		
 	Catch
 		Return ""
 	End Try

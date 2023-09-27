@@ -1,5 +1,5 @@
 ﻿B4A=true
-Group=Libraries
+Group=Default Group
 ModulesStructureVersion=1
 Type=Class
 Version=11
@@ -13,6 +13,7 @@ Private Sub Class_Globals
 	Private force_resize As Boolean
 	Private radius_,degree_ As Int
 	Private center_crop As Boolean
+	Private circle_crop As Boolean
 	Private img As Object
 	Private duration As Int
 	Private holder As Bitmap
@@ -21,6 +22,7 @@ Private Sub Class_Globals
 	Private dir As String
 	Private Su As StringUtils
 	Private is_success As Boolean
+	Private no_cache As Boolean
 	#if b4a
 	dir = File.DirInternal
 	#Else
@@ -30,6 +32,7 @@ Private Sub Class_Globals
 	Private module_ As Object
 	Private event_ As String
 	Private tag_ As Object
+	Private url_ As String
 End Sub
 
 'Initializes the object. You can add parameters to this method if needed.
@@ -69,6 +72,11 @@ Public Sub Success As Boolean
 	Return is_success
 End Sub
 
+Public Sub NoCache As Picture
+	no_cache = True
+	Return Me
+End Sub
+
 'The radius filter is applied at the end 
 Public Sub SetRadius(Radius As Int) As Picture
 	radius_ = Radius
@@ -91,6 +99,12 @@ Public Sub CenterCrop(iv As ImageView) As Picture
 	Return Me
 End Sub
 
+Public Sub CircleCrop(iv As ImageView) As Picture
+	circle_crop = True
+	img = iv
+	Return Me
+End Sub
+
 Public Sub ShowFade(IV As B4XView,bt As Bitmap)
 	
 	IV.Visible = False
@@ -103,28 +117,32 @@ Public Sub Download(Url As String) As ResumableSub
 
 	Dim filename As String = GetFilename(Url)
 
-	If File.Exists(dir & "/" & cache_folder,filename) Then
-		Try
-			Dim b As Bitmap = LoadBitmap(dir & "/" & cache_folder,filename)
-			cache.Put(Su.EncodeBase64(Url.GetBytes("UTF8")),b)
+	If no_cache = False Then
+		
+		If File.Exists(dir & "/" & cache_folder,filename) Then
+			Try
+				Dim b As Bitmap = LoadBitmap(dir & "/" & cache_folder,filename)
+				cache.Put(Su.EncodeBase64(Url.GetBytes("UTF8")),b)
+				is_success = True
+				If event_ <> "" And module_ <> Null Then
+					CallSubDelayed3(module_,event_ & "_OnDownloadPicture",ApplyFilter(b),tag_)
+				Else
+					Return ApplyFilter(b)
+				End If
+				
+			Catch
+			End Try
+		End If
+		
+		If cache.ContainsKey(Su.EncodeBase64(Url.GetBytes("UTF8"))) Then
 			is_success = True
 			If event_ <> "" And module_ <> Null Then
-				CallSubDelayed3(module_,event_ & "_OnDownloadPicture",ApplyFilter(b),tag_)
+				CallSubDelayed3(module_,event_ & "_OnDownloadPicture",ApplyFilter(cache.Get(filename)),tag_)
 			Else
-				Return ApplyFilter(b)
+			Return ApplyFilter(cache.Get(filename))
 			End If
-			
-		Catch
-		End Try
-	End If
-	
-	If cache.ContainsKey(Su.EncodeBase64(Url.GetBytes("UTF8"))) Then
-		is_success = True
-		If event_ <> "" And module_ <> Null Then
-			CallSubDelayed3(module_,event_ & "_OnDownloadPicture",ApplyFilter(cache.Get(filename)),tag_)
-		Else
-		Return ApplyFilter(cache.Get(filename))
 		End If
+	
 	End If
 	
 	If True Then
@@ -149,7 +167,10 @@ Public Sub Download(Url As String) As ResumableSub
 			
 				res = ApplyFilter(res)
 				
-				cache.Put(Su.EncodeBase64(Url.GetBytes("UTF8")),res)
+				Try
+					cache.Put(Su.EncodeBase64(Url.GetBytes("UTF8")),res)
+				Catch
+				End Try
 				
 				If event_ <> "" And module_ <> Null Then
 					CallSubDelayed3(module_,event_ & "_OnDownloadPicture",res,tag_)
@@ -179,6 +200,11 @@ Public Sub Download(Url As String) As ResumableSub
 	
 End Sub
 
+Public Sub LoadURL(Url As String) As Picture
+	url_ = Url
+	Return Me
+End Sub
+
 Public Sub LoadFile(Dirname As String,Filename As String) As Picture
 	
 	Try
@@ -194,10 +220,21 @@ Public Sub LoadFile(Dirname As String,Filename As String) As Picture
 End Sub
 
 Public Sub Into(destImageview As ImageView)
+	
+	If url_ <> "" Then
+		
+		Wait For (Download(url_)) Complete(Res As Bitmap)
+			If Success Then destImageview.Bitmap = Res
+			
+		Return
+		
+	End If
+	
 	Try
 		destImageview.Bitmap = temp_bitmap
 	Catch
 	End Try
+	
 End Sub
 
 #region private subrootine
@@ -239,6 +276,7 @@ Private Sub GetFilename(fullpath As String) As String
 		rs = fullpath.SubString(index + 1)
 		rs = Su.EncodeBase64(rs.GetBytes("UTF8"))
 		rs = rs.Replace("/","").Replace("\","").Replace("=","")
+		If rs.Length > 40 Then rs = rs.SubString2(0,39)
 		Return rs
 	Catch
 		Return fullpath
@@ -299,7 +337,8 @@ Private Sub RoundBitmap(Input As Bitmap,Corner As Int) As Bitmap
 	
 End Sub
 
-Private Sub FillImage(bmp As B4XBitmap, ImageView As B4XView) As Bitmap
+Private Sub FillImage(bmp As Bitmap, ImageView As B4XView) As Bitmap
+	
 	Dim bmpRatio As Float = bmp.Width / bmp.Height
 	Dim viewRatio As Float = ImageView.Width / ImageView.Height
 	If viewRatio > bmpRatio Then

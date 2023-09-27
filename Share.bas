@@ -1,5 +1,5 @@
 ﻿B4A=true
-Group=Libraries
+Group=Default Group
 ModulesStructureVersion=1
 Type=StaticCode
 Version=7.8
